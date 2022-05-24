@@ -1,2 +1,11 @@
 src/*.o
 src/cache
+
+.vs/
+240.*
+Debug/
+*.xlsx
+*.o
+*.exe
+*.rar
+*.zip

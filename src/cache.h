@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+
 //
 // Student Information
 //
@@ -25,6 +26,18 @@ extern const char *email;
 
 #define TRUE 1
 #define FALSE 0
+
+typedef struct cacheSet {
+	uint32_t* tags;
+	uint32_t* accs;
+	uint32_t counter;
+} cacheSet;
+
+typedef struct addrParsed {
+	uint32_t tag;
+	uint32_t index;
+	uint32_t offset;
+} addrParsed;
 
 //------------------------------------//
 //        Cache Configuration         //
@@ -74,15 +87,32 @@ void init_cache();
 // Return the access time for the memory operation
 //
 uint32_t icache_access(uint32_t addr);
+void icache_evict(uint32_t addr);
 
 // Perform a memory access through the dcache interface for the address 'addr'
 // Return the access time for the memory operation
 //
 uint32_t dcache_access(uint32_t addr);
+void dcache_evict(uint32_t addr);
 
 // Perform a memory access to the l2cache for the address 'addr'
 // Return the access time for the memory operation
 //
 uint32_t l2cache_access(uint32_t addr);
+
+
+int
+findTag(uint32_t tag, cacheSet* cs, int len);
+int8_t
+findEntry(cacheSet cs, int len);
+
+addrParsed
+iParseAddr(uint32_t addr);
+
+addrParsed
+dParseAddr(uint32_t addr);
+
+addrParsed
+l2ParseAddr(uint32_t addr);
 
 #endif
