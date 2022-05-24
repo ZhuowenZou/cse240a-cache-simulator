@@ -97,8 +97,8 @@ void dcache_evict(uint32_t addr);
 
 // Perform a memory access to the l2cache for the address 'addr'
 // Return the access time for the memory operation
-//
-uint32_t l2cache_access(uint32_t addr);
+// from == 0 : I cache; 1 : D cache
+uint32_t l2cache_access(uint32_t addr, uint8_t from);
 
 
 int

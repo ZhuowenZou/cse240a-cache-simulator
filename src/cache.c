@@ -166,8 +166,8 @@ icache_access(uint32_t addr)
 		icache[ap.index].accs[loc] = icache[ap.index].counter;
 
 		// ACCESS time 
-		uint32_t penalty = l2cache_access(addr);
-		icachePenalties += penalty + l2cacheHitTime; // 
+		uint32_t penalty = l2cache_access(addr, 0);
+		icachePenalties += penalty; // 
 		return penalty;
 	}
 
@@ -223,7 +223,7 @@ dcache_access(uint32_t addr)
 		dcache[ap.index].accs[loc] = dcache[ap.index].counter;
 
 		// ACCESS time 
-		uint32_t penalty = l2cache_access(addr);
+		uint32_t penalty = l2cache_access(addr, 1);
 
 		dcachePenalties += penalty; // +l2cacheHitTime;
 
@@ -252,7 +252,7 @@ dcache_evict(uint32_t addr)
 // Return the access time for the memory operation
 //
 uint32_t
-l2cache_access(uint32_t addr)
+l2cache_access(uint32_t addr, uint8_t from)
 {
 
 	addrParsed ap = l2ParseAddr(addr);
@@ -280,8 +280,10 @@ l2cache_access(uint32_t addr)
 		// handle inclusion policy: 
 		if (inclusive) {
 			if (l2cache[ap.index].accs[loc] != 0) {
-				icache_evict(addr);
-				dcache_evict(addr);
+				if (from == 1) 
+					dcache_evict(addr);
+				else 
+					icache_evict(addr);
 			}
 		}
 		
@@ -292,7 +294,7 @@ l2cache_access(uint32_t addr)
 		// ACCESS time 
 		uint32_t penalty = memspeed;
 		l2cachePenalties += penalty; // 
-		return penalty;
+		return penalty + l2cacheHitTime;
 	}
 }
 
