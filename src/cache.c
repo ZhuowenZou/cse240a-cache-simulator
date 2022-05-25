@@ -169,7 +169,7 @@ icache_access(uint32_t addr)
 		// ACCESS time 
 		uint32_t penalty = l2cache_access(addr, 0);
 		icachePenalties += penalty; // 
-		return penalty;
+		return penalty + icacheHitTime;
 	}
 
 }
@@ -229,7 +229,7 @@ dcache_access(uint32_t addr)
 
 		dcachePenalties += penalty; // +l2cacheHitTime;
 
-		return penalty;
+		return penalty + dcacheHitTime;
 	}
 
 }

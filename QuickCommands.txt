@@ -3,7 +3,7 @@ docker run --rm -it -v c:\Assignment\CSE240\cse240a-cache-simulator:/testcode2 g
 
 
 MIPS R10K
-bunzip2 -kc ../traces/mat_20M.bz2 | ./cache --icache=128:2:2 --dcache=64:4:2 --l2cache=128:8:50 --blocksize=128 --memspeed=100 --inclusive
+bunzip2 -kc ../traces/mat_20M.bz2 | ./cache --icache=128:2:2 --dcache=64:4:2 --l2cache=128:8:50 --blocksize=128 --memspeed=100 
 
 Alpha A21264
 
