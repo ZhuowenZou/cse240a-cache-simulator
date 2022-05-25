@@ -1,8 +1,12 @@
 src/*.o
 src/cache
 
+src/mat_20M
+
+cache.sln
+cache.vcxproj*
+
 .vs/
-240.*
 Debug/
 *.xlsx
 *.o

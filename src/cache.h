@@ -99,12 +99,13 @@ void dcache_evict(uint32_t addr);
 // Return the access time for the memory operation
 // from == 0 : I cache; 1 : D cache
 uint32_t l2cache_access(uint32_t addr, uint8_t from);
+void l2cache_update(uint32_t addr);
 
 
 int
 findTag(uint32_t tag, cacheSet* cs, int len);
-int8_t
-findEntry(cacheSet cs, int len);
+int
+findEntry(cacheSet* cs, int len);
 
 addrParsed
 iParseAddr(uint32_t addr);

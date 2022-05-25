@@ -152,6 +152,7 @@ icache_access(uint32_t addr)
 		// update latest accs
 		icache[ap.index].accs[loc] = icache[ap.index].counter;
 
+		//l2cache_update(addr);
 		return icacheHitTime;
 	}
 	else {
@@ -159,7 +160,7 @@ icache_access(uint32_t addr)
 		icacheMisses += 1;   // missed
 
 		// inclusive or exclusive l2, addr always goes in l1;
-		int loc = findEntry(icache[ap.index], icacheAssoc); 
+		int loc = findEntry(&icache[ap.index], icacheAssoc); 
 
 		// update cache
 		icache[ap.index].tags[loc] = ap.tag;
@@ -209,6 +210,7 @@ dcache_access(uint32_t addr)
 		// update latest accs
 		dcache[ap.index].accs[loc] = dcache[ap.index].counter;
 
+		//l2cache_update(addr);
 		return dcacheHitTime;
 	}
 	else {
@@ -216,7 +218,7 @@ dcache_access(uint32_t addr)
 		dcacheMisses += 1;       // missed
 
 		// inclusive or exclusive l2, addr always goes in l1;
-		int loc = findEntry(dcache[ap.index], dcacheAssoc);
+		int loc = findEntry(&dcache[ap.index], dcacheAssoc);
 
 		// update cache
 		dcache[ap.index].tags[loc] = ap.tag;
@@ -258,16 +260,14 @@ l2cache_access(uint32_t addr, uint8_t from)
 	addrParsed ap = l2ParseAddr(addr);
 
 	l2cacheRefs += 1;       // I$ references
-
 	l2cache[ap.index].counter += 1;
 
-	int loc = findTag(ap.tag, &l2cache[ap.index], l2cacheAssoc);
+	int loc = findTag(ap.tag, &(l2cache[ap.index]), l2cacheAssoc);
 
 	// addr is in the cache
 	if (loc != -1) {
 		// update latest accs
 		l2cache[ap.index].accs[loc] = l2cache[ap.index].counter;
-
 		return l2cacheHitTime;
 	}
 	else {
@@ -275,15 +275,14 @@ l2cache_access(uint32_t addr, uint8_t from)
 		l2cacheMisses += 1;       // missed
 
 		// inclusive or exclusive l2, addr always goes in l1;
-		int loc = findEntry(l2cache[ap.index], l2cacheAssoc);
+		addrParsed ap = l2ParseAddr(addr);
+		int loc = findEntry(&l2cache[ap.index], l2cacheAssoc);
 
 		// handle inclusion policy: 
 		if (inclusive) {
 			if (l2cache[ap.index].accs[loc] != 0) {
-				if (from == 1) 
-					dcache_evict(addr);
-				else 
-					icache_evict(addr);
+				dcache_evict(addr);
+				icache_evict(addr);
 			}
 		}
 		
@@ -295,6 +294,21 @@ l2cache_access(uint32_t addr, uint8_t from)
 		uint32_t penalty = memspeed;
 		l2cachePenalties += penalty; // 
 		return penalty + l2cacheHitTime;
+	}
+}
+
+// update least recently used address
+void
+l2cache_update(uint32_t addr) {
+
+	addrParsed ap = l2ParseAddr(addr);
+	int loc = findTag(ap.tag, &l2cache[ap.index], l2cacheAssoc);
+
+	// addr is in the cache
+	if (loc != -1) {
+		// update latest accs
+		l2cache[ap.index].counter += 1;
+		l2cache[ap.index].accs[loc] = l2cache[ap.index].counter;
 	}
 }
 
@@ -312,17 +326,17 @@ findTag(uint32_t tag, cacheSet* cs, int len)
 }
 
 // Find the location for new cache
-int8_t
-findEntry(cacheSet cs, int len)
+int
+findEntry(cacheSet* cs, int len)
 {
 	int loc = 0;
 	for (int i = 0; i < len; i++) {
 		// acc == 0 means available
-		if (cs.accs[i] == 0) {
+		if (cs->accs[i] == 0) {
 			return i;
 		}
 		// prefer the location with ealiest access
-		else if (cs.accs[i] < cs.accs[loc]) {
+		else if (cs->accs[i] < cs->accs[loc]) {
 			loc = i;
 		}
 	}
