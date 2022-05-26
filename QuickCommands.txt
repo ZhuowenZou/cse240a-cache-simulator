@@ -9,7 +9,6 @@ Alpha A21264
 
 bunzip2 -kc ../traces/insertsort.bz2 |./cache --icache=512:2:2 --dcache=256:4:2 --l2cache=16384:8:50 --blocksize=64 --memspeed=100 --inclusive
 
-
 docker run --rm -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined -v c:\Assignment\CSE240\cse240a-cache-simulator:/testcode2 gandhardesh13/240a_base:v2
 
 run --icache=512:2:2 --dcache=256:4:2 --l2cache=16384:8:50 --blocksize=64 --memspeed=100 --inclusive < mat_20M

@@ -138,16 +138,25 @@ init_cache()
 uint32_t
 icache_access(uint32_t addr)
 {
-	
-	addrParsed ap = iParseAddr(addr);
+	// handle special case - no icache
+	if (icacheSets <= 0) {
+
+		// ACCESS time 
+		uint32_t penalty = l2cache_access(addr, 0);
+		icachePenalties += penalty; // 
+		return penalty; // +icacheHitTime;
+		
+	}
 
 	icacheRefs += 1;       // I$ references
+
+	addrParsed ap = iParseAddr(addr);
 
 	icache[ap.index].counter += 1;
 
 	int loc = findTag(ap.tag, &icache[ap.index], icacheAssoc);
 
-	// addr is in the cache
+	// addr is in the cache	
 	if ( loc != -1) {
 		// update latest accs
 		icache[ap.index].accs[loc] = icache[ap.index].counter;
@@ -196,6 +205,15 @@ icache_evict(uint32_t addr)
 uint32_t
 dcache_access(uint32_t addr)
 {
+
+	if (dcacheSets <= 0) {
+
+		// ACCESS time 
+		uint32_t penalty = l2cache_access(addr, 0);
+		dcachePenalties += penalty; // 
+		return penalty; // +dcacheHitTime;
+
+	}
 
 	addrParsed ap = dParseAddr(addr);
 
@@ -256,6 +274,15 @@ dcache_evict(uint32_t addr)
 uint32_t
 l2cache_access(uint32_t addr, uint8_t from)
 {
+
+	if (l2cacheSets <= 0) {
+
+		// ACCESS time 
+		uint32_t penalty = memspeed;
+		l2cachePenalties += penalty; // 
+		return penalty; // +l2cacheHitTime;
+
+	}
 
 	addrParsed ap = l2ParseAddr(addr);
 
